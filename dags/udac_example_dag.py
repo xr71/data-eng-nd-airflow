@@ -56,9 +56,14 @@ stage_songs_to_redshift = StageToRedshiftOperator(
     data_format="JSON"
 )
 
+# load factor operator
 load_songplays_table = LoadFactOperator(
     task_id='Load_songplays_fact_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="songplay",
+    sql="songplay_table_insert",     # from SqlQueries class attribute from helper file
+    append_only=False
 )
 
 load_user_dimension_table = LoadDimensionOperator(
@@ -83,8 +88,11 @@ load_time_dimension_table = LoadDimensionOperator(
 
 run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    tables=["songplay", "users", "song", "artist", "time"]
 )
+
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 
