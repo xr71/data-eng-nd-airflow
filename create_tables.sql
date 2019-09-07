@@ -85,6 +85,14 @@ CREATE TABLE public.users (
 );
 
 
-
+CREATE TABLE public.time (
+    start_time timestamp PRIMARY KEY,
+    hour varchar,
+    day varchar,
+    week varchar,
+    month varchar,
+    year varchar,
+    weekday varchar
+)
 
 

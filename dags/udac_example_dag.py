@@ -61,36 +61,52 @@ load_songplays_table = LoadFactOperator(
     task_id='Load_songplays_fact_table',
     dag=dag,
     redshift_conn_id="redshift",
-    table="songplay",
+    table="songplays",
     sql="songplay_table_insert",     # from SqlQueries class attribute from helper file
     append_only=False
 )
 
 load_user_dimension_table = LoadDimensionOperator(
     task_id='Load_user_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="users",
+    sql="user_table_insert",
+    append_only=False
 )
 
 load_song_dimension_table = LoadDimensionOperator(
     task_id='Load_song_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="songs",
+    sql="song_table_insert",
+    append_only=False
 )
 
 load_artist_dimension_table = LoadDimensionOperator(
     task_id='Load_artist_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="artists",
+    sql="artist_table_insert",
+    append_only=False
 )
 
 load_time_dimension_table = LoadDimensionOperator(
     task_id='Load_time_dim_table',
-    dag=dag
+    dag=dag,
+    redshift_conn_id="redshift",
+    table="time",
+    sql="time_table_insert",
+    append_only=False
 )
 
 run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
     dag=dag,
     redshift_conn_id="redshift",
-    tables=["songplay", "users", "song", "artist", "time"]
+    tables=["songplays", "users", "songs", "artists", "time"]
 )
 
 
