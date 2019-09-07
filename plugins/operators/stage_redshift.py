@@ -7,12 +7,20 @@ from airflow.contrib.hooks.aws_hook import AwsHook
 class StageToRedshiftOperator(BaseOperator):
     ui_color = '#358140'
     
-    copy_sql = """
+    copy_sql_songs = """
         COPY {} FROM '{}'
         ACCESS_KEY_ID '{}'
         SECRET_ACCESS_KEY '{}'
         REGION '{}'
         {} 'auto';
+    """
+    
+    copy_sql_events = """
+        COPY {} FROM '{}'
+        ACCESS_KEY_ID '{}'
+        SECRET_ACCESS_KEY '{}'
+        REGION '{}'
+        FORMAT AS JSON 's3://udacity-dend/log_json_path.json';
     """
 
     @apply_defaults
@@ -49,14 +57,25 @@ class StageToRedshiftOperator(BaseOperator):
         
         self.log.info("Start copying files from S3")
         
-        formatted_sql = StageToRedshiftOperator.copy_sql.format(
-                self.redshift_table, 
-                self.s3_path, 
-                credentials.access_key,
-                credentials.secret_key, 
-                self.aws_region,
-                self.data_format
-            )
+        if self.redshift_table == "staging_events":
+            formatted_sql = StageToRedshiftOperator.copy_sql_events.format(
+                    self.redshift_table, 
+                    self.s3_path, 
+                    credentials.access_key,
+                    credentials.secret_key, 
+                    self.aws_region
+                )
+            
+        if self.redshift_table == "staging_songs":
+            formatted_sql = StageToRedshiftOperator.copy_sql_songs.format(
+                    self.redshift_table, 
+                    self.s3_path, 
+                    credentials.access_key,
+                    credentials.secret_key, 
+                    self.aws_region,
+                    self.data_format
+                )
+         
         
         redshift.run(formatted_sql)
         self.log.info("Finished copying from S3")

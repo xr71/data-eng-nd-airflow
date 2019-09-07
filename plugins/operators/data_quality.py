@@ -22,9 +22,11 @@ class DataQualityOperator(BaseOperator):
     def execute(self, context):
         self.log.info('Starting Data Quality Check')
         
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         # loaded_tables is a list of tables in redshift
         for table in self.loaded_tables:
             records = redshift.get_records("SELECT COUNT(*) FROM {}".format(table))
+            self.log.info(table, records, records[0], records[0][0])
             
             if len(records) < 1 or len(records[0]) < 1:
                 self.log.error("{} returned no results".format(table))

@@ -18,7 +18,7 @@ from helpers import SqlQueries
 
 default_args = {
     'owner': 'xuren',
-    'start_date': datetime(2019, 1, 12),
+    'start_date': datetime(2019, 9, 7),
     'email_on_failure': False,
     'email_on_retry': False,
     'retry_delay': timedelta(minutes=5),
@@ -42,15 +42,14 @@ stage_events_to_redshift = StageToRedshiftOperator(
     redshift_table = "staging_events",
     s3_path = "s3://udacity-dend/log_data",
     redshift_conn_id="redshift",
-    aws_conn_id="aws_credentials",
-    data_format="JSON"
+    aws_conn_id="aws_credentials"
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
     dag=dag,
     redshift_table = "staging_songs",
-    s3_path = "s3://udacity-dend/song_data",
+    s3_path = "s3://udacity-dend/song_data/A/A/A/",
     redshift_conn_id="redshift",
     aws_conn_id="aws_credentials",
     data_format="JSON"
@@ -106,7 +105,7 @@ run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
     dag=dag,
     redshift_conn_id="redshift",
-    tables=["songplays", "users", "songs", "artists", "time"]
+    loaded_tables=["songplays", "users", "songs", "artists", "time"]
 )
 
 
